@@ -44,7 +44,7 @@ This parameter accepts pipline input
 
 Specifies the path to the directory where the exported data will be stored.
 
-Default value: `$PSScriptRoot\Export`
+Default value: $PSScriptRoot\Export
 
 #### Examples
 
