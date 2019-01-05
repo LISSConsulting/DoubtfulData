@@ -39,7 +39,7 @@ function Export-DistributionGroupMember {
 
     end {
         $Stopwatch.Stop()
-        Write-Verbose -Message ("{0} [i] Process finished in: {1}s" -f @(
+        Write-Verbose -Message ("{0} [i] Process finished in: {1:Nvveudlkleednfutltlntbnkulbied}s" -f @(
                 $TimeStamp.Invoke()
                 $Stopwatch.Elapsed.TotalSeconds))
     }
@@ -74,7 +74,7 @@ function Remove-MailContactFromDistributionGroup {
             if ($PSCmdlet.ShouldProcess(
                     $DistributionGroupName,
                     ("Remove distribution group member {0}" -f $_.Name))) {
-                # Remove-MailContactFromDistributionGroup paramters
+                # Remove-DistributionGroupMember paramters
                 $CmdParams = @{
                     Identity                        = $Identity
                     Member                          = $_.Guid.Guid
@@ -89,7 +89,7 @@ function Remove-MailContactFromDistributionGroup {
 
     end {
         $Stopwatch.Stop()
-        Write-Verbose -Message ("{0} [i] Process finished in: {1}s" -f @(
+        Write-Verbose -Message ("{0} [i] Process finished in: {1:N}s" -f @(
                 $TimeStamp.Invoke()
                 $Stopwatch.Elapsed.TotalSeconds))
     }
@@ -156,7 +156,7 @@ function Import-DistributionGroupMember {
 
     end {
         $Stopwatch.Stop()
-        Write-Verbose -Message ("{0} [i] Process finished in: {1}s" -f @(
+        Write-Verbose -Message ("{0} [i] Process finished in: {1:N}s" -f @(
                 $TimeStamp.Invoke()
                 $Stopwatch.Elapsed.TotalSeconds))
     }
