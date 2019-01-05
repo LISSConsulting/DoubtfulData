@@ -21,14 +21,7 @@ This commands requires Exchange Online modules to be present in current PowerShe
 ### Export-DistributionGroupMember
 
 #### Description
-Use this command to export members of specified distribution group. The exported
-data is saved in `Export` subfolder, in the module folder, e.g.,
-
-    DoubtfulData\Export\acme.onmicrosoft.com
-
-Each distribution group is saved under its own subfolder using the group's GUID for the folder name, and normalized group's name for the file name, e.g.,
-
-    DoubtfulData\Export\acme.onmicrosoft.com\6f7f77ae-d6d4-4b03-8551-828c20af2b1d\Bugs.xml
+Use this command to export members of specified distribution group. Data is exported in Clixml format and saved in module folder `Exports\<Tenant Name>\<Distribution Group GUID>\`.
 
 #### Parameters
 
