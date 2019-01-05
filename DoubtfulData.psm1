@@ -11,8 +11,7 @@ function Export-DistributionGroupMember {
         $Identity,
 
         # Specifies path to use for storing exported data
-        [Parameter(
-            Position = 1)]
+        [Parameter(Position = 1)]
         [ValidateNotNullOrEmpty()]
         [System.IO.DirectoryInfo]
         $Path = "$PSScriptRoot\Export"
