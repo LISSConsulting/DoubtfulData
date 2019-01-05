@@ -73,7 +73,7 @@ Use this command to remove **MailContact** recipient type members from specified
 
 **`-Identity`**
 
-The Identity parameter specifies the distribution group or mail-enabled security group that you want to export. You can use any value that uniquely identifies the group.
+The Identity parameter specifies the distribution group or mail-enabled security group from which you want to remove MailContact recipeints. You can use any value that uniquely identifies the group.
 
 For example:
  - Name
@@ -122,7 +122,7 @@ Use this command to import distribution group members exported with `Export-Dist
 
 **`-Identity`**
 
-The Identity parameter specifies the distribution group or mail-enabled security group that you want to export. You can use any value that uniquely identifies the group.
+The Identity parameter specifies the distribution group or mail-enabled security group into which you want to import members. You can use any value that uniquely identifies the group.
 
 For example:
  - Name
