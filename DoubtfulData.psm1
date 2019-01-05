@@ -31,7 +31,7 @@ function Export-DistributionGroupMember {
                 $Name))
         $FilePath = "$PSScriptRoot\Export\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
         if (-not (Test-Path (Split-Path -Path $FilePath))) {
-            [void](New-Item -Path (Split-Path -Path $FilePath) -ItemType Directory)
+            [void](New-Item -Path (Split-Path -Path $FilePath) -ItemType Directory -Force)
         }
         Get-DistributionGroupMember -Identity $Identity |
             Export-Clixml -Path $FilePath -Force
