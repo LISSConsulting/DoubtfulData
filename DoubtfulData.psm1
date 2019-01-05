@@ -28,22 +28,35 @@ function Export-DistributionGroupMember {
             $DistributionGroup = Get-DistributionGroup -Identity $Identity
             @(
                 $DistributionGroup.Guid
-                $DistributionGroup.Name -replace "[$InvalidCharacters]"
+                $DistributionGroup.Name
                 ($DistributionGroup.DistinguishedName -split ",")[1].Substring(3)
             )
         }
         Write-Verbose -Message ("{0} [i] Processing distribution group: {1}" -f @(
                 $TimeStamp.Invoke()
                 $Name))
-        $FilePath = "$Path\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
+        $FilePath = "{0}\{1}\{2}\{3}.xml" -f @(
+            $Path.FullName
+            $Tenant
+            $Guid
+            $Name -replace "[$InvalidCharacters]"
+        )
+
         # New-Item paramters
         $CmdParams = @{
-            Path        = Split-Path -Path $FilePath
+            Path        = (Split-Path -Path $FilePath)
             ItemType    = "Directory"
             Force       = $true
             ErrorAction = "SilentlyContinue"
         }
-        [void](New-Item -Path @CmdParams)
+        [void](New-Item @CmdParams)
+
+        # Write-Progress parameters
+        $CmdParams = @{
+            Activity = "Exporting Distribution Group Members: $Name"
+        }
+        Write-Progress @CmdParams
+
         Get-DistributionGroupMember -Identity $Identity |
             Export-Clixml -Path $FilePath -Force
     }
@@ -85,6 +98,12 @@ function Remove-MailContactFromDistributionGroup {
             if ($PSCmdlet.ShouldProcess(
                     $DistributionGroupName,
                     ("Remove distribution group member {0}" -f $_.Name))) {
+                # Write-Progress parameters
+                $CmdParams = @{
+                    Activity = "Removing Distribution Group Members: $DistributionGroupName"
+                }
+                Write-Progress @CmdParams
+
                 # Remove-DistributionGroupMember paramters
                 $CmdParams = @{
                     Identity                        = $Identity
@@ -137,7 +156,7 @@ function Import-DistributionGroupMember {
             $DistributionGroup = Get-DistributionGroup -Identity $Identity
             @(
                 $DistributionGroup.Guid
-                $DistributionGroup.Name -replace "[$InvalidCharacters]"
+                $DistributionGroup.Name
                 ($DistributionGroup.DistinguishedName -split ",")[1].Substring(3)
             )
         }
@@ -145,7 +164,12 @@ function Import-DistributionGroupMember {
                 $TimeStamp.Invoke()
                 $Name))
 
-        $FilePath = "$Path\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
+        $FilePath = "{0}\{1}\{2}\{3}.xml" -f @(
+            $Path.FullName
+            $Tenant
+            $Guid
+            $Name -replace "[$InvalidCharacters]"
+        )
         Write-Verbose -Message ("{0} [i] Importing distribution group export file: {1}" -f @(
                 $TimeStamp.Invoke()
                 $FilePath))
@@ -165,6 +189,12 @@ function Import-DistributionGroupMember {
                     $TimeStamp.Invoke()
                     $_.Name
                     $_.PrimarySMTPAddress))
+            # Write-Progress parameters
+            $CmdParams = @{
+                Activity = "Importing Distribution Group Members: $Name"
+            }
+            Write-Progress @CmdParams
+
             # Add-DistributionGroupMember parameters
             $CmdParams = @{
                 Identity                        = $Identity
