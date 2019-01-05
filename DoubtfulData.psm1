@@ -117,7 +117,13 @@ function Import-DistributionGroupMember {
             ValueFromPipeline,
             ValueFromPipelineByPropertyName)]
         [string]
-        $Identity
+        $Identity,
+
+        # Specifies path to import data
+        [Parameter(Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        [System.IO.DirectoryInfo]
+        $Path = "$PSScriptRoot\Export"
     )
 
     begin {
@@ -139,12 +145,17 @@ function Import-DistributionGroupMember {
                 $TimeStamp.Invoke()
                 $Name))
 
-        $FilePath = "$PSScriptRoot\Export\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
+        $FilePath = "$Path\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
         Write-Verbose -Message ("{0} [i] Importing distribution group export file: {1}" -f @(
                 $TimeStamp.Invoke()
                 $FilePath))
         if (-not (Test-Path -Path $FilePath)) {
-            Write-Error -Message "Distribution Group export file not found at: $FilePath" -Category OpenError
+            # Write-Error paramters
+            $CmdParams = @{
+                Message  = "Distribution Group export file not found at: $FilePath"
+                Category = "OpenError"
+            }
+            Write-Error @CmdParams
         }
 
         Import-Clixml -Path $FilePath |
