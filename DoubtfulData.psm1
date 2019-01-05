@@ -8,7 +8,14 @@ function Export-DistributionGroupMember {
             ValueFromPipeline,
             ValueFromPipelineByPropertyName)]
         [string]
-        $Identity
+        $Identity,
+
+        # Specifies path to use for storing exported data
+        [Parameter(
+            Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        [System.IO.DirectoryInfo]
+        $Path = "$PSScriptRoot\Export"
     )
 
     begin {
@@ -29,7 +36,7 @@ function Export-DistributionGroupMember {
         Write-Verbose -Message ("{0} [i] Processing distribution group: {1}" -f @(
                 $TimeStamp.Invoke()
                 $Name))
-        $FilePath = "$PSScriptRoot\Export\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
+        $FilePath = "$Path\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
         if (-not (Test-Path (Split-Path -Path $FilePath))) {
             [void](New-Item -Path (Split-Path -Path $FilePath) -ItemType Directory -Force)
         }
