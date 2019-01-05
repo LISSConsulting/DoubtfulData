@@ -21,7 +21,7 @@ This commands requires Exchange Online modules to be present in current PowerShe
 ### Export-DistributionGroupMember
 
 #### Description
-Use this command to export members of specified distribution group. Data is exported in Clixml format and saved in module folder `Exports\<Tenant Name>\<Distribution Group GUID>\`.
+Use this command to export members of specified distribution group. Data is exported in Clixml format and saved in module folder `Exports\<Tenant Name>\<Distribution Group GUID>\<Group Name>.xml`.
 
 #### Parameters
 
