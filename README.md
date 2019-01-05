@@ -11,6 +11,11 @@ Extract the module archive to a location included in PSModulePath, e.g.
 
 ## Usage
 
+Import the module into current PowerShell session:
+```powershell
+Import-Module DoubtfulData
+```
+
 This commands requires Exchange Online modules to be present in current PowerShell session. Before using this module, connect to Microsoft Exchange online.
 
 ### Export-DistributionGroupMember
