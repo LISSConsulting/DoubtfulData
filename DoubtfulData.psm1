@@ -37,9 +37,14 @@ function Export-DistributionGroupMember {
                 $TimeStamp.Invoke()
                 $Name))
         $FilePath = "$Path\{0}\{1}\{2}.xml" -f $Tenant, $Guid, $Name
-        if (-not (Test-Path (Split-Path -Path $FilePath))) {
-            [void](New-Item -Path (Split-Path -Path $FilePath) -ItemType Directory -Force)
+        # New-Item paramters
+        $CmdParams = @{
+            Path        = Split-Path -Path $FilePath
+            ItemType    = "Directory"
+            Force       = $true
+            ErrorAction = "SilentlyContinue"
         }
+        [void](New-Item -Path @CmdParams)
         Get-DistributionGroupMember -Identity $Identity |
             Export-Clixml -Path $FilePath -Force
     }
