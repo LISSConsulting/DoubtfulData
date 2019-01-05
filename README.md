@@ -4,7 +4,7 @@ removing MailContact recipient type members from the distribution group, and imp
 
 
 ## Installation
-Extract the module archive to a location included in PSModulePath, e.g.
+Download release distribution from https://github.com/LISSConsulting/DoubtfulData/releases and extract the module archive to a location included in PSModulePath, e.g.
 
     ~\Documents\WindowsPowerShell\Modules
 
