@@ -34,7 +34,7 @@ Each distribution group is saved under its own subfolder using the group's GUID 
 
 **`-Identity`**
 
-The Identity parameter specifies the distribution group or mail-enabled security group that you want to export. You can use any value that uniquely identifies the group.
+The Identity parameter specifies the distribution group or mail-enabled security group which members you want to export. You can use any value that uniquely identifies the group.
 
 For example:
  - Name
