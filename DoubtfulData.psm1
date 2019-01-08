@@ -46,9 +46,9 @@ function Export-DistributionGroupMember {
 
         # New-Item paramters
         $CmdParams = @{
-            Path        = ($FilePath | Split-Path)
-            ItemType    = "Directory"
-            Force       = $true
+            Path     = ($FilePath | Split-Path)
+            ItemType = "Directory"
+            Force    = $true
         }
         [void](New-Item @CmdParams)
 
@@ -103,25 +103,25 @@ function Remove-MailContactFromDistributionGroup {
         Get-DistributionGroupMember -Identity $Identity |
             Where-Object RecipientTypeDetails -EQ MailContact |
             ForEach-Object {
-                if ($PSCmdlet.ShouldProcess(
-                        $DGName, ("Remove distribution group member {0}" -f $_.Name))) {
-                    # Write-Progress parameters
-                    $CmdParams = @{
-                        Activity = "Removing Distribution Group Members: $DGName"
-                    }
-                    Write-Progress @CmdParams
-
-                    # Remove-DistributionGroupMember paramters
-                    $CmdParams = @{
-                        Identity                        = $Identity
-                        Member                          = $_.Guid.Guid
-                        BypassSecurityGroupManagerCheck = $true
-                        Confirm                         = $false
-                        Verbose                         = $false
-                    }
-                    Remove-DistributionGroupMember @CmdParams
+            if ($PSCmdlet.ShouldProcess(
+                    $DGName, ("Remove distribution group member {0}" -f $_.Name))) {
+                # Write-Progress parameters
+                $CmdParams = @{
+                    Activity = "Removing Distribution Group Members: $DGName"
                 }
+                Write-Progress @CmdParams
+
+                # Remove-DistributionGroupMember paramters
+                $CmdParams = @{
+                    Identity                        = $Identity
+                    Member                          = $_.Guid.Guid
+                    BypassSecurityGroupManagerCheck = $true
+                    Confirm                         = $false
+                    Verbose                         = $false
+                }
+                Remove-DistributionGroupMember @CmdParams
             }
+        }
     }
 
     end {
@@ -184,12 +184,19 @@ function Import-DistributionGroupMember {
                 $FilePath))
 
         Import-Clixml -Path $FilePath |
-            Where-Object { $_.RecipientTypeDetails -eq "MailContact" -and $_.PrimarySMTPAddress } |
+            Where-Object $_.RecipientTypeDetails -EQ MailContact |
             ForEach-Object {
+                if ($_.PrimarySMTPAddress) {
+                    $PrimarySMTPAddress = $_.PrimarySMTPAddress
+                } else {
+                    $PrimarySMTPAddress = $_.ExternalEmailAddress -replace "SMTP:"
+                }
+
                 Write-Verbose -Message ("{0} [+] Adding distribution group member: '{1} <{2}>'" -f @(
                         &$TimeStamp
                         $_.Name
-                        $_.PrimarySMTPAddress))
+                        $PrimarySMTPAddress))
+
                 # Write-Progress parameters
                 $CmdParams = @{
                     Activity = "Importing Distribution Group Members: $Name"
@@ -199,7 +206,7 @@ function Import-DistributionGroupMember {
                 # Add-DistributionGroupMember parameters
                 $CmdParams = @{
                     Identity                        = $Identity
-                    Member                          = $_.PrimarySMTPAddress
+                    Member                          = $PrimarySMTPAddress
                     BypassSecurityGroupManagerCheck = $true
                     Verbose                         = $false
                 }
