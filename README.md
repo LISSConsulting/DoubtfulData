@@ -17,7 +17,7 @@ Import the module into current PowerShell session:
 Import-Module DoubtfulData
 ```
 
-This commands requires Exchange Online cmdlets to be present in current PowerShell session. Before using this module, connect to Microsoft Exchange online.
+This commands requires Exchange cmdlets to be present in current PowerShell session. Before using this module, connect to Microsoft Exchange server.
 
 ### Export-DistributionGroupMember
 
