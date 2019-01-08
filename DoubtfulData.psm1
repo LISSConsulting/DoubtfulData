@@ -13,12 +13,12 @@ function Export-DistributionGroupMember {
         # Specifies path to use for storing exported data
         [Parameter(Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [System.IO.DirectoryInfo]
+        [IO.DirectoryInfo]
         $Path = "$PSScriptRoot\Export"
     )
 
     begin {
-        $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $Stopwatch = [Diagnostics.Stopwatch]::StartNew()
         $InvalidCharacters = "'`"!@#$%^&*()\s"
         $TimeStamp = { [datetime]::Now.ToString("MM/dd/yy hh:mm:ss tt") }
     }
@@ -32,10 +32,12 @@ function Export-DistributionGroupMember {
                 ($DistributionGroup.DistinguishedName -split ",")[1].Substring(3)
             )
         }
+
         Write-Verbose -Message ("{0} [i] Processing distribution group: {1}" -f @(
-                $TimeStamp.Invoke()
+                &$TimeStamp
                 $Name))
-        $FilePath = "{0}\{1}\{2}\{3}.xml" -f @(
+
+        [IO.FileInfo]$FilePath = "{0}\{1}\{2}\{3}.xml" -f @(
             $Path.FullName
             $Tenant
             $Guid
@@ -44,10 +46,9 @@ function Export-DistributionGroupMember {
 
         # New-Item paramters
         $CmdParams = @{
-            Path        = (Split-Path -Path $FilePath)
+            Path        = ($FilePath | Split-Path)
             ItemType    = "Directory"
             Force       = $true
-            ErrorAction = "SilentlyContinue"
         }
         [void](New-Item @CmdParams)
 
@@ -57,6 +58,10 @@ function Export-DistributionGroupMember {
         }
         Write-Progress @CmdParams
 
+        Write-Verbose -Message ("{0} [i] Exporting distribution group members file: {1}" -f @(
+                &$TimeStamp
+                $FilePath.Name))
+
         Get-DistributionGroupMember -Identity $Identity |
             Export-Clixml -Path $FilePath -Force
     }
@@ -64,7 +69,7 @@ function Export-DistributionGroupMember {
     end {
         $Stopwatch.Stop()
         Write-Verbose -Message ("{0} [i] Process finished in: {1:N}s" -f @(
-                $TimeStamp.Invoke()
+                &$TimeStamp
                 $Stopwatch.Elapsed.TotalSeconds))
     }
 }
@@ -84,43 +89,45 @@ function Remove-MailContactFromDistributionGroup {
     )
 
     begin {
-        $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $Stopwatch = [Diagnostics.Stopwatch]::StartNew()
         $TimeStamp = { [datetime]::Now.ToString("MM/dd/yy hh:mm:ss tt") }
     }
 
     process {
-        $DistributionGroupName = (Get-DistributionGroup -Identity $Identity).Name
-        Write-Verbose -Message ("{0} [i] Processing distribution group: {1}" -f @(
-                $TimeStamp.Invoke()
-                $DistributionGroupName))
-        Get-DistributionGroupMember -Identity $Identity |
-            Where-Object RecipientTypeDetails -EQ MailContact | ForEach-Object {
-            if ($PSCmdlet.ShouldProcess(
-                    $DistributionGroupName,
-                    ("Remove distribution group member {0}" -f $_.Name))) {
-                # Write-Progress parameters
-                $CmdParams = @{
-                    Activity = "Removing Distribution Group Members: $DistributionGroupName"
-                }
-                Write-Progress @CmdParams
+        $DGName = (Get-DistributionGroup -Identity $Identity).Name
 
-                # Remove-DistributionGroupMember paramters
-                $CmdParams = @{
-                    Identity                        = $Identity
-                    Member                          = $_.Guid.Guid
-                    BypassSecurityGroupManagerCheck = $true
-                    Confirm                         = $false
-                    Verbose                         = $false
+        Write-Verbose -Message ("{0} [i] Processing distribution group: {1}" -f @(
+                &$TimeStamp
+                $DGName))
+
+        Get-DistributionGroupMember -Identity $Identity |
+            Where-Object RecipientTypeDetails -EQ MailContact |
+            ForEach-Object {
+                if ($PSCmdlet.ShouldProcess(
+                        $DGName, ("Remove distribution group member {0}" -f $_.Name))) {
+                    # Write-Progress parameters
+                    $CmdParams = @{
+                        Activity = "Removing Distribution Group Members: $DGName"
+                    }
+                    Write-Progress @CmdParams
+
+                    # Remove-DistributionGroupMember paramters
+                    $CmdParams = @{
+                        Identity                        = $Identity
+                        Member                          = $_.Guid.Guid
+                        BypassSecurityGroupManagerCheck = $true
+                        Confirm                         = $false
+                        Verbose                         = $false
+                    }
+                    Remove-DistributionGroupMember @CmdParams
                 }
-                Remove-DistributionGroupMember @CmdParams
             }
-        }
     }
 
     end {
         $Stopwatch.Stop()
         Write-Verbose -Message ("{0} [i] Process finished in: {1:N}s" -f @(
-                $TimeStamp.Invoke()
+                &$TimeStamp
                 $Stopwatch.Elapsed.TotalSeconds))
     }
 }
@@ -141,12 +148,12 @@ function Import-DistributionGroupMember {
         # Specifies path to import data
         [Parameter(Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [System.IO.DirectoryInfo]
+        [IO.DirectoryInfo]
         $Path = "$PSScriptRoot\Export"
     )
 
     begin {
-        $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $Stopwatch = [Diagnostics.Stopwatch]::StartNew()
         $InvalidCharacters = "'`"!@#$%^&*()\s"
         $TimeStamp = { [datetime]::Now.ToString("MM/dd/yy hh:mm:ss tt") }
     }
@@ -160,8 +167,9 @@ function Import-DistributionGroupMember {
                 ($DistributionGroup.DistinguishedName -split ",")[1].Substring(3)
             )
         }
+
         Write-Verbose -Message ("{0} [i] Processing distribution group: {1}" -f @(
-                $TimeStamp.Invoke()
+                &$TimeStamp
                 $Name))
 
         $FilePath = "{0}\{1}\{2}\{3}.xml" -f @(
@@ -170,46 +178,39 @@ function Import-DistributionGroupMember {
             $Guid
             $Name -replace "[$InvalidCharacters]"
         )
+
         Write-Verbose -Message ("{0} [i] Importing distribution group export file: {1}" -f @(
-                $TimeStamp.Invoke()
+                &$TimeStamp
                 $FilePath))
-        if (-not (Test-Path -Path $FilePath)) {
-            # Write-Error paramters
-            $CmdParams = @{
-                Message  = "Distribution Group export file not found at: $FilePath"
-                Category = "OpenError"
-            }
-            Write-Error @CmdParams
-        }
 
         Import-Clixml -Path $FilePath |
             Where-Object { $_.RecipientTypeDetails -eq "MailContact" -and $_.PrimarySMTPAddress } |
             ForEach-Object {
-            Write-Verbose -Message ("{0} [+] Adding distribution group member: '{1} <{2}>'" -f @(
-                    $TimeStamp.Invoke()
-                    $_.Name
-                    $_.PrimarySMTPAddress))
-            # Write-Progress parameters
-            $CmdParams = @{
-                Activity = "Importing Distribution Group Members: $Name"
-            }
-            Write-Progress @CmdParams
+                Write-Verbose -Message ("{0} [+] Adding distribution group member: '{1} <{2}>'" -f @(
+                        &$TimeStamp
+                        $_.Name
+                        $_.PrimarySMTPAddress))
+                # Write-Progress parameters
+                $CmdParams = @{
+                    Activity = "Importing Distribution Group Members: $Name"
+                }
+                Write-Progress @CmdParams
 
-            # Add-DistributionGroupMember parameters
-            $CmdParams = @{
-                Identity                        = $Identity
-                Member                          = $_.PrimarySMTPAddress
-                BypassSecurityGroupManagerCheck = $true
-                Verbose                         = $false
+                # Add-DistributionGroupMember parameters
+                $CmdParams = @{
+                    Identity                        = $Identity
+                    Member                          = $_.PrimarySMTPAddress
+                    BypassSecurityGroupManagerCheck = $true
+                    Verbose                         = $false
+                }
+                Add-DistributionGroupMember @CmdParams
             }
-            Add-DistributionGroupMember @CmdParams
-        }
     }
 
     end {
         $Stopwatch.Stop()
         Write-Verbose -Message ("{0} [i] Process finished in: {1:N}s" -f @(
-                $TimeStamp.Invoke()
+                &$TimeStamp
                 $Stopwatch.Elapsed.TotalSeconds))
     }
 }
